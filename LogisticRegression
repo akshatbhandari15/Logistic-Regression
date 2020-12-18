@@ -1,0 +1,39 @@
+import pandas as pd
+import numpy as np
+
+train = pd.read_csv("train.csv")
+train = train.drop(["PassengerId", "Name", "Ticket", "Cabin", "Age"], axis = 1)
+train = train.replace(to_replace="C", value=1)
+train = train.replace(to_replace="S", value=2)
+train = train.replace(to_replace="Q", value=3)
+
+train = train.replace(to_replace="male", value=1)
+train = train.replace(to_replace="female", value=2)
+train.insert(0, "X", 1 )
+
+
+survived = train.Survived
+train = train.drop(["Survived"], axis = 1)
+
+train = train.to_numpy()
+survived = survived.to_numpy()
+
+no_of_features = train.shape[1]
+theta = np.zeros([no_of_features, 1 ])
+m = len(survived)
+
+h = train @ theta
+s = np.isnan(h)
+h[s]=0.0
+alpha = 0.1
+y = survived[:, np.newaxis]
+for i in range(1000):
+    
+    sigmoid = 1 / (1 + np.exp(-h))
+    logLoss = -(1/m)*np.sum(((y)*(np.log(sigmoid)) - ((1 - y))*np.log(1-sigmoid)))
+    gradDesc = (1/m) * (train.T @ (sigmoid - y))
+    h = train@theta
+    theta = theta - alpha*gradDesc
+    print(logLoss)
+    
+
