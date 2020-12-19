@@ -28,6 +28,7 @@ survived = survived.to_numpy()
 no_of_features = train.shape[1]
 theta = np.zeros([no_of_features, 1 ])
 m = len(survived)
+file1 = open('output.txt', 'w')
 
 h = train @ theta
 s = np.isnan(h)
@@ -37,19 +38,29 @@ y = survived[:, np.newaxis]
 
 costs = []
 
-for i in range(10000):
+for i in range(1000):
     sigmoid = 1 / (1 + np.exp(-h))
     logLoss = -(1/m)*np.sum(((y)*(np.log(sigmoid)) + ((1 - y))*np.log(1-sigmoid)))
     gradDesc = (1/m) * (train.T @ (sigmoid - y))
     theta = theta - alpha*gradDesc
     h = train@theta
-    print("Cost is: ", logLoss)
-    
+    s = f"Cost is: {logLoss} at Iteration {i}  \n"
+    file1.write(s)
     costs.append(logLoss)
+    if i == 999:
+        file1.write(f"Final values of weights are: {theta}")
     
+file1.close()
     
 import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+ax.plot(costs)
 
-plt.plot(costs)
-    
+ax.set(xlabel= 'Iterations', ylabel='Cost',
+       title='Plot of cost function against no. of iterations')
+ax.grid()
+
+fig.savefig("test.png")
+plt.show()
+
 
