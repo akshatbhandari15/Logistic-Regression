@@ -1,3 +1,6 @@
+Note: Scroll to the bottom for final values of theta
+
+
 Cost is: 0.6931471805599453 at Iteration 0  
 Cost is: 0.6765477934844457 at Iteration 1  
 Cost is: 0.6668593283211652 at Iteration 2  
