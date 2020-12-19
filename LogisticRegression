@@ -1,8 +1,15 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec 18 12:41:05 2020
+
+@author: aksha
+"""
+
 import pandas as pd
 import numpy as np
 
 train = pd.read_csv("train.csv")
-train = train.drop(["PassengerId", "Name", "Ticket", "Cabin", "Age"], axis = 1)
+train = train.drop(["PassengerId", "Name", "Ticket", "Cabin", "Age", "Fare"], axis = 1)
 train = train.replace(to_replace="C", value=1)
 train = train.replace(to_replace="S", value=2)
 train = train.replace(to_replace="Q", value=3)
@@ -27,13 +34,22 @@ s = np.isnan(h)
 h[s]=0.0
 alpha = 0.1
 y = survived[:, np.newaxis]
-for i in range(1000):
-    
+
+costs = []
+
+for i in range(10000):
     sigmoid = 1 / (1 + np.exp(-h))
-    logLoss = -(1/m)*np.sum(((y)*(np.log(sigmoid)) - ((1 - y))*np.log(1-sigmoid)))
+    logLoss = -(1/m)*np.sum(((y)*(np.log(sigmoid)) + ((1 - y))*np.log(1-sigmoid)))
     gradDesc = (1/m) * (train.T @ (sigmoid - y))
-    h = train@theta
     theta = theta - alpha*gradDesc
-    print(logLoss)
+    h = train@theta
+    print("Cost is: ", logLoss)
+    
+    costs.append(logLoss)
+    
+    
+import matplotlib.pyplot as plt
+
+plt.plot(costs)
     
 
