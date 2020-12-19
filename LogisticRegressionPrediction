@@ -1,0 +1,114 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Dec 19 15:07:07 2020
+
+@author: aksha
+"""
+ruuning Logisitc Regression on test.csv
+"""
+Created on Fri Dec 18 12:41:05 2020
+
+@author: aksha
+"""
+
+import pandas as pd
+import numpy as np
+
+train = pd.read_csv("train.csv")
+train = train.drop(["PassengerId", "Name", "Ticket", "Cabin", "Age", "Fare"], axis = 1)
+train = train.replace(to_replace="C", value=1)
+train = train.replace(to_replace="S", value=2)
+train = train.replace(to_replace="Q", value=3)
+
+train = train.replace(to_replace="male", value=1)
+train = train.replace(to_replace="female", value=2)
+train.insert(0, "X", 1 )
+
+
+survived = train.Survived
+train = train.drop(["Survived"], axis = 1)
+
+train = train.to_numpy()
+survived = survived.to_numpy()
+
+no_of_features = train.shape[1]
+theta = np.zeros([no_of_features, 1 ])
+m = len(survived)
+file1 = open('output.txt', 'w')
+
+h = train @ theta
+s = np.isnan(h)
+h[s]=0.0
+alpha = 0.1
+y = survived[:, np.newaxis]
+
+costs = []
+
+for i in range(1000):
+    sigmoid = 1 / (1 + np.exp(-h))
+    logLoss = -(1/m)*np.sum(((y)*(np.log(sigmoid)) + ((1 - y))*np.log(1-sigmoid)))
+    gradDesc = (1/m) * (train.T @ (sigmoid - y))
+    theta = theta - alpha*gradDesc
+    h = train@theta
+    s = f"Cost is: {logLoss} at Iteration {i}  \n"
+    file1.write(s)
+    costs.append(logLoss)
+    if i == 999:
+        file1.write(f"Final values of weights are: {theta}")
+    
+file1.close()
+    
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots()
+ax.plot(costs)
+
+ax.set(xlabel= 'Iterations', ylabel='Cost',
+       title='Plot of cost function against no. of iterations')
+ax.grid()
+
+fig.savefig("test.png")
+plt.show()
+
+
+train = pd.read_csv("test.csv")
+pred = train.PassengerId
+train = train.drop(["PassengerId", "Name", "Ticket", "Cabin", "Age", "Fare"], axis = 1)
+train = train.replace(to_replace="C", value=1)
+train = train.replace(to_replace="S", value=2)
+train = train.replace(to_replace="Q", value=3)
+train = train.replace(to_replace="male", value=1)
+train = train.replace(to_replace="female", value=2)
+
+test = train
+test.insert(0, "X", 1 )
+
+
+hypothesis = test@theta
+probability = 1 / (1 + np.exp(-hypothesis))
+probability = probability.to_numpy()
+prediction = []
+
+for x in probability:
+    if (x>=0.5):
+        prediction.append(1)
+    else:
+        prediction.append(0)
+
+prediction = pd.Series(prediction)
+prediction = prediction.rename("Survived")
+pred = pd.concat([pred, prediction],axis = 1)
+print(pred)
+
+
+pred.to_csv("Predictions.csv")
+
+
+
+
+
+
+
+
+
+
+
